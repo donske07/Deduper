@@ -1,7 +1,9 @@
 use clap::{App, Arg};
+use config::Config;
 use ingest_service::IngestService;
 
 mod cache_service;
+mod config;
 mod database;
 mod dedupe_command;
 mod event;
@@ -64,21 +66,23 @@ async fn main() {
         .get_matches();
 
     setup_logger(true, matches.value_of("log-conf"));
+    let config = Config::new();
 
     // TODO: list topics
     let _topics = matches.values_of("topics").unwrap();
-    let brokers = matches.value_of("brokers").unwrap();
-    let group_id = matches.value_of("group-id").unwrap();
+    // TODO: use passed in broker string instead of .env
+    let _brokers = matches.value_of("brokers").unwrap();
+    let _group_id = matches.value_of("group-id").unwrap();
     let event_type = matches.value_of("event-type").unwrap();
     let log = matches.is_present("log");
 
-    let mut cache_manager = RedisCacheManager::new(&String::from("REDIS_CONFIG"));
+    let mut cache_manager = RedisCacheManager::new(&config.redis_connection_string());
     cache_manager.connect().await;
 
-    let connection = Database::new("RED_SHIFT_CONFIG").await;
+    let connection = Database::new(&config.db_connection_string()).await;
     let ingest_service = IngestService::new(connection, log);
 
-    DedupeCommand::new(cache_manager, ingest_service, log)
-        .execute(brokers, group_id, &event_type)
+    DedupeCommand::new(cache_manager, ingest_service, config, log)
+        .execute(&event_type)
         .await;
 }
