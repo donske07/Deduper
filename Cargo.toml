@@ -1,0 +1,23 @@
+[package]
+name = "t_kafka_rust"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rdkafka = { version = "0.25", features = ["cmake-build"] }
+clap = "2.18.0"
+log = "0.4.17"
+chrono = "0.4.19"
+env_logger = "0.9.0"
+tokio = { version = "1.18.2", features = ["full"] }
+redis = { version = "0.21.5", features = ["tokio-comp"] }
+serde_json = "1.0.81"
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1.0.31"
+field_names = "0.2.0"
+tokio-postgres = "0.7.6"
+futures = "0.3.21"
+rskafka = "0.2.0"
+dotenv = "0.15.0"
